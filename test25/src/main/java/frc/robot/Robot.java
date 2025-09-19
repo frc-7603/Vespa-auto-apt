@@ -4,41 +4,35 @@
 
 package frc.robot;
 
-import edu.wpi.first.util.sendable.SendableRegistry;
+import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.drive.DifferentialDrive;
-import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
 
 /**
- * This is a demo program showing the use of the DifferentialDrive class, specifically it contains
- * the code necessary to operate a robot with tank drive.
+ * Simple FRC robot program using CAN VictorSPX motor controllers for tank drive.
  */
 public class Robot extends TimedRobot {
-  private final DifferentialDrive m_robotDrive;
-  private final Joystick m_leftStick;
-  private final Joystick m_rightStick;
+  // CAN IDs from Phoenix Tuner
+  private final VictorSPX motorL1 = new VictorSPX(10);
+  private final VictorSPX motorL2 = new VictorSPX(7);
+  private final VictorSPX motorR1 = new VictorSPX(5);
+  private final VictorSPX motorR2 = new VictorSPX(6);
 
-  private final PWMSparkMax m_leftMotor = new PWMSparkMax(0);
-  private final PWMSparkMax m_rightMotor = new PWMSparkMax(1);
-
-  /** Called once at the beginning of the robot program. */
-  public Robot() {
-    // We need to invert one side of the drivetrain so that positive voltages
-    // result in both sides moving forward. Depending on how your robot's
-    // gearbox is constructed, you might have to invert the left side instead.
-    m_rightMotor.setInverted(true);
-
-    m_robotDrive = new DifferentialDrive(m_leftMotor::set, m_rightMotor::set);
-    m_leftStick = new Joystick(0);
-    m_rightStick = new Joystick(1);
-
-    SendableRegistry.addChild(m_robotDrive, m_leftMotor);
-    SendableRegistry.addChild(m_robotDrive, m_rightMotor);
-  }
+  // Single joystick (gamepad)
+  private final Joystick stick = new Joystick(0);
 
   @Override
   public void teleopPeriodic() {
-    m_robotDrive.tankDrive(-m_leftStick.getY(), -m_rightStick.getY());
+    // Tank drive with joystick axes
+    double leftSpeed = -stick.getRawAxis(1);  // left stick Y
+    double rightSpeed = -stick.getRawAxis(5); // right stick Y
+
+    // Send outputs to motors
+    motorL1.set(ControlMode.PercentOutput, leftSpeed);
+    motorL2.set(ControlMode.PercentOutput, leftSpeed);
+
+    motorR1.set(ControlMode.PercentOutput, rightSpeed);
+    motorR2.set(ControlMode.PercentOutput, rightSpeed);
   }
 }
