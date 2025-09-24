@@ -25,18 +25,23 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopPeriodic() {
+  // Forward/backward from left stick Y (axis 1)
+  double forward = -stick.getRawAxis(1) / 3;
 
-    // Tank drive with joystick axes
-    double leftSpeed = -stick.getRawAxis(1);  // left stick Y
-    double rightSpeed = -stick.getRawAxis(5); // right stick Y
+  // Rotation from right stick X (axis 4) 
+  double rotation = stick.getRawAxis(4) / 3;
 
-    // Send outputs to motors
-    motorL1.set(ControlMode.PercentOutput, leftSpeed);
-    motorL2.set(ControlMode.PercentOutput, leftSpeed);
+  // Combine for arcade drive
+  double leftSpeed = forward + rotation;
+  double rightSpeed = forward - rotation;
 
-    motorR1.set(ControlMode.PercentOutput, rightSpeed);
-    motorR2.set(ControlMode.PercentOutput, rightSpeed);
-  }
+  // Send outputs to motors
+  motorL1.set(ControlMode.PercentOutput, leftSpeed);
+  motorL2.set(ControlMode.PercentOutput, leftSpeed);
+
+  motorR1.set(ControlMode.PercentOutput, rightSpeed);
+  motorR2.set(ControlMode.PercentOutput, rightSpeed);
+}
 
   @Override
   public void autonomousInit() {}
