@@ -9,15 +9,15 @@ This repo is dedicated to developing and testing autonomous systems for the **20
 
 ## 📌 Purpose
 - Experiment with new autonomous programming techniques.  
-- Prototype and test auto paths (APT = Auto Path Testing) (or April tags).
+- Prototype and test auto paths (APT = Auto Path Testing) (or AprilTags).
 - Keep track of concepts, code snippets, and strategies for competition.  
 
 ---
 
 ## 🛠 Tech & Tools
 - **FRC WPILib!**
-- Pathwayplanner
-- Photon vision  
+- PathPlanner
+- PhotonVision 
 - GitHub for version control & organization.  
 
 ---
@@ -31,7 +31,7 @@ This repo is dedicated to developing and testing autonomous systems for the **20
 
 ## ✅ Goals for 2025/2026
 - [ ] Implement reliable path planning. (mostly for a back-up system)
-- [ ] - [ ] Integrate vision targeting.  
+- [ ] Integrate vision targeting.  
 - [ ] Test multiple autonomous routines.  (eg. left, right and center)
 - [ ] Ensure auto code is competition-ready!
 
