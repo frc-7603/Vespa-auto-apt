@@ -6,7 +6,6 @@ package frc.robot;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
-
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.TimedRobot;
 
@@ -25,11 +24,11 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopPeriodic() {
-  // Forward/backward from left stick Y (axis 1)
-  double forward = -stick.getRawAxis(1) / 3;
+  // Forward/backward from left stick X (axis 0)
+  double forward = -stick.getRawAxis(0) / 3;
 
-  // Rotation from right stick X (axis 4) 
-  double rotation = stick.getRawAxis(4) / 3;
+  // Rotation from right stick Y (axis 5) 
+  double rotation = stick.getRawAxis(5) / 3;
 
   // Combine for arcade drive
   double leftSpeed = forward + rotation;
@@ -41,6 +40,8 @@ public class Robot extends TimedRobot {
 
   motorR1.set(ControlMode.PercentOutput, rightSpeed);
   motorR2.set(ControlMode.PercentOutput, rightSpeed);
+  //right stick = turn
+  //left stick = move
 }
 
   @Override
