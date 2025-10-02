@@ -1,9 +1,7 @@
 # VespaRobotics 2025/2026 Auto-APT repo
 
 Welcome to the **VespaRobotics Auto-APT Repository**!  
-This repo is dedicated to developing and testing autonomous systems for the **2025 - 2026 FRC season**.  
-
-(AKA: this is where L1F3 tries to organize all his ideas for auto systems… lol)
+This repo is dedicated to developing and testing autonomous systems for the **2025 - 2026 FRC season**. 
 
 ---
 
