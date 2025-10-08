@@ -7,7 +7,7 @@ This repo is dedicated to developing and testing autonomous systems for the **20
 
 ## 📌 Purpose
 - Experiment with new autonomous programming techniques.  
-- Prototype and test auto paths (APT = Auto Path Testing) (or AprilTags).
+- Prototype and test auto paths (APT = AprilTags).
 - Keep track of concepts, code snippets, and strategies for competition.  
 
 ---
