@@ -12,10 +12,11 @@ import edu.wpi.first.wpilibj.TimedRobot;
 public class Robot extends TimedRobot {
 
   // CAN IDs for drivetrain
-  private final VictorSPX motorL2 = new VictorSPX(2);
-  private final VictorSPX motorL1 = new VictorSPX(1);
-  private final VictorSPX motorR2 = new VictorSPX(8);
-  private final VictorSPX motorR1 = new VictorSPX(9);
+  private final VictorSPX motorL2 = new VictorSPX(1);
+  private final VictorSPX motorL1 = new VictorSPX(2);
+
+  private final VictorSPX motorR2 = new VictorSPX(3);
+  private final VictorSPX motorR1 = new VictorSPX(4);
 
   // CAN IDs for shooter
   private final VictorSPX bottomShooter = new VictorSPX(7);  
