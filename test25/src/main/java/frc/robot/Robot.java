@@ -17,21 +17,11 @@ public class Robot extends TimedRobot {
   private final VictorSPX motorR2 = new VictorSPX(8);
   private final VictorSPX motorR1 = new VictorSPX(9);
 
-  // CAN IDs for shooter
-  private final VictorSPX bottomShooter = new VictorSPX(7);  
-  private final VictorSPX topShooter = new VictorSPX(10);
+  // project
+  private final VictorSPX topShooter = new VictorSPX(3);
 
   // Joystick
   private final Joystick stick = new Joystick(0);
-
-  // Shooter button mappings
-  private final int intakeButton = 5;
-  private final int shootButton  = 6;
-  private final int revButton    = 7;
-
-  // Shooter speeds
-  private final double intakespeed = 0.67;   // adjust as needed
-  private final double firingspeed = -1;  // negative if needed for outtake
 
   @Override
   public void teleopPeriodic() {
@@ -46,28 +36,6 @@ public class Robot extends TimedRobot {
     motorL2.set(ControlMode.PercentOutput, leftSpeed);
     motorR1.set(ControlMode.PercentOutput, rightSpeed);
     motorR2.set(ControlMode.PercentOutput, rightSpeed);
-
-    // Shooter Control 
-    if (stick.getRawButton(intakeButton)) {
-      // Intake: pull game piece in
-      bottomShooter.set(ControlMode.PercentOutput, intakespeed);
-      topShooter.set(ControlMode.PercentOutput, intakespeed);
-    } 
-    else if (stick.getRawButton(shootButton)) {
-      // Shoot/outtake
-      bottomShooter.set(ControlMode.PercentOutput, firingspeed);
-      topShooter.set(ControlMode.PercentOutput, firingspeed);
-    } 
-  else if (stick.getRawButton(revButton)) {
-      // Rev BOTH shooters
-      bottomShooter.set(ControlMode.PercentOutput, firingspeed);
-      topShooter.set(ControlMode.PercentOutput, firingspeed);
-    } 
-  else {
-    // Stop shooters
-    bottomShooter.set(ControlMode.PercentOutput, 0);
-    topShooter.set(ControlMode.PercentOutput, 0);
-  }
 }
 
   @Override
