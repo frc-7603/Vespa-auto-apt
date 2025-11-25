@@ -9,40 +9,6 @@ import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.TimedRobot;
 
-// public class Robot extends TimedRobot {
-
-//   // CAN IDs
-//   private final VictorSPX motorR1 = new VictorSPX(1);
-//   private final VictorSPX motorR2 = new VictorSPX(2);
-
-//   private final VictorSPX motorL2 = new VictorSPX(8);
-//   private final VictorSPX motorL1 = new VictorSPX(9);
-
-//   // joystick
-//   private final GenericHID stick = new GenericHID(0);
-
-//   @Override
-//   public void teleopPeriodic() {
-//   // Forward/backward from left stick X (axis 0)
-//   double forward = -stick.getRawAxis(0) / 3;
-
-//   // Rotation from right stick Y (axis 5) 
-//   double rotation = stick.getRawAxis(5) / 3;
-
-//   // Combine for arcade drive
-//   double leftSpeed = forward + rotation;
-//   double rightSpeed = forward - rotation;
-
-//   // Send outputs to motors
-//   motorL1.set(ControlMode.PercentOutput, leftSpeed);
-//   motorL2.set(ControlMode.PercentOutput, leftSpeed);
-
-//   motorR1.set(ControlMode.PercentOutput, rightSpeed);
-//   motorR2.set(ControlMode.PercentOutput, rightSpeed);
-//   //right stick = turn
-//   //left stick = move
-//}
-
 public class Robot extends TimedRobot {
 
   private final VictorSPX motorR1 = new VictorSPX(8);
@@ -55,16 +21,10 @@ public class Robot extends TimedRobot {
 
   @Override
   public void robotInit() {
-    // Fix forward movement direction
-    // motorR1.setInverted(true);
-    // motorL2.setInverted(true);
-    // motorL1.setInverted(true);
-    // motorR2.setInverted(true);
-
     double rotation = stick.getRawAxis(0);
     
     if(rotation > 0.2){
-      System.out.println(rotation);
+      //System.out.println(rotation);
       
       motorR1.setInverted(false);
       motorL2.setInverted(false);
