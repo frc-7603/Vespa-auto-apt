@@ -29,7 +29,7 @@ This repo is dedicated to developing and testing autonomous systems for the **20
 
 ## ✅ Goals for 2025/2026
 - [ ] Implement reliable path planning. (mostly for a back-up system)
-- [ ] Integrate vision targeting.  
+- [ ] Integrate vision APT targeting.  
 - [ ] Test multiple autonomous routines.  (eg. left, right and center)
 - [ ] Ensure auto code is competition-ready!
 
