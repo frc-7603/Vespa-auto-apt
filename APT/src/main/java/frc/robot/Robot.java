@@ -1,5 +1,9 @@
 package frc.robot;
 
+import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.can.VictorSPX;
+
+import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.TimedRobot;
 import org.photonvision.PhotonCamera;
 import org.photonvision.targeting.PhotonPipelineResult;
@@ -13,15 +17,23 @@ public class Robot extends TimedRobot {
 
     private PhotonCamera camera; // Declare the camera instance
 
+    private final VictorSPX motorR1 = new VictorSPX(8);
+    private final VictorSPX motorR2 = new VictorSPX(2);
+
+    private final VictorSPX motorL2 = new VictorSPX(1);
+    private final VictorSPX motorL1 = new VictorSPX(9);
+
+    private final GenericHID stick = new GenericHID(0);
+
     @Override
     public double getPeriod(){
-        return 0.02; // run every 2ms
+        return 0.2; // run every 5ms
     }
     
     @Override
     public void robotInit() {
         // Initialize PhotonCamera
-        camera = new PhotonCamera("FHD_Camera");
+        camera = new PhotonCamera("cam1");
         
         // Start camera streaming (optional for visualization)
         UsbCamera usbCamera = CameraServer.startAutomaticCapture();
@@ -67,5 +79,22 @@ public class Robot extends TimedRobot {
             // No targets detected
             System.out.println("No targets detected.");
         }
+    }
+
+
+
+    @Override
+    public void teleopPeriodic() {
+    double forward = -stick.getRawAxis(0) / 3;
+    double rotation = stick.getRawAxis(5) / 3;
+
+    double leftSpeed = forward + rotation;
+    double rightSpeed = forward - rotation;
+
+    motorL1.set(ControlMode.PercentOutput, leftSpeed);
+    motorL2.set(ControlMode.PercentOutput, leftSpeed);
+
+    motorR1.set(ControlMode.PercentOutput, rightSpeed);
+    motorR2.set(ControlMode.PercentOutput, rightSpeed);
     }
 }
