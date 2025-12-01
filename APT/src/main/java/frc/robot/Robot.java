@@ -25,6 +25,12 @@ public class Robot extends TimedRobot {
 
     private final GenericHID stick = new GenericHID(0);
 
+    // PID-like constants
+    private final double kP_turn = 0.03;     // how hard to turn toward yaw correction
+    private final double kP_forward = 0.1;   // how hard to drive toward target
+
+    private boolean autoEnabled = false;
+
     @Override
     public double getPeriod(){
         return 0.2; // run every 5ms
@@ -55,9 +61,10 @@ public class Robot extends TimedRobot {
 
             // Get the transform from the camera to the target (if available)
             Transform3d camToTarget = target.getBestCameraToTarget();
+
             if (camToTarget != null) {
                 System.out.println("Camera to Target Transform: " + camToTarget);
-
+//67
                 // Calculate the 3D distance from the camera to the target
                 double distance = Math.sqrt(
                     camToTarget.getTranslation().getX() * camToTarget.getTranslation().getX() +
@@ -81,8 +88,6 @@ public class Robot extends TimedRobot {
         }
     }
 
-
-
     @Override
     public void teleopPeriodic() {
     double forward = -stick.getRawAxis(0) / 3;
@@ -96,5 +101,64 @@ public class Robot extends TimedRobot {
 
     motorR1.set(ControlMode.PercentOutput, rightSpeed);
     motorR2.set(ControlMode.PercentOutput, rightSpeed);
+    }
+    @Override
+    public void autonomousInit() {
+        autoEnabled = true;
+        System.out.println("AUTO STARTED");
+    }
+
+    @Override
+    public void autonomousPeriodic() {
+        if (!autoEnabled) return;
+
+        PhotonPipelineResult result = camera.getLatestResult();
+
+        if (result.hasTargets()) {
+            PhotonTrackedTarget target = result.getBestTarget();
+
+            double yaw = target.getYaw();  // angle left/right to tag
+
+            // Distance from camera to tag (meters)
+            Transform3d camToTarget = target.getBestCameraToTarget();
+            double distance = camToTarget.getTranslation().getX();
+
+            // Turning control
+            double turnSpeed = yaw * kP_turn;
+
+            // Forward control
+            double forwardSpeed = distance * kP_forward;
+
+            // Clamp speeds so robot doesn’t go crazy (Crazy like LE SRFM Crazy?)
+            turnSpeed = Math.max(-0.4, Math.min(0.4, turnSpeed));
+            forwardSpeed = Math.max(-0.5, Math.min(0.5, forwardSpeed));
+
+            // Stop when within 0.5 meters
+            if (distance < 0.5) {
+                forwardSpeed = 0;
+                turnSpeed = 0;
+                System.out.println("Reached Tag!");
+            }
+
+            // Tank drive output
+            double leftSpeed = forwardSpeed + turnSpeed;
+            double rightSpeed = forwardSpeed - turnSpeed;
+
+            motorL1.set(ControlMode.PercentOutput, leftSpeed);
+            motorL2.set(ControlMode.PercentOutput, leftSpeed);
+
+            motorR1.set(ControlMode.PercentOutput, rightSpeed);
+            motorR2.set(ControlMode.PercentOutput, rightSpeed);
+
+            System.out.println("AUTO: yaw=" + yaw + " dist=" + distance);
+
+        } else {
+            motorL1.set(ControlMode.PercentOutput, 0);
+            motorL2.set(ControlMode.PercentOutput, 0);
+            motorR1.set(ControlMode.PercentOutput, 0);
+            motorR2.set(ControlMode.PercentOutput, 0);
+
+            System.out.println("AUTO: No tag!");
+        }
     }
 }
