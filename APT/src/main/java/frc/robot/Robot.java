@@ -25,15 +25,15 @@ public class Robot extends TimedRobot {
 
     private final GenericHID stick = new GenericHID(0);
 
-    // PID-like constants
-    private final double kP_turn = 0.03;     // how hard to turn toward yaw correction
-    private final double kP_forward = 0.1;   // how hard to drive toward target
+    // PID (ish) constants
+    private final double kP_turn = 0.02;     // how hard to turn toward yaw correction
+    //private final double kP_forward = 0.2;   // how hard to drive toward target
 
     private boolean autoEnabled = false;
 
     @Override
     public double getPeriod(){
-        return 0.2; // run every 5ms
+        return 0.2; // run every 2ms
     }
     
     @Override
@@ -90,8 +90,8 @@ public class Robot extends TimedRobot {
 
     @Override
     public void teleopPeriodic() {
-    double forward = -stick.getRawAxis(0) / 3;
-    double rotation = stick.getRawAxis(5) / 3;
+    double forward = stick.getRawAxis(0) / 3;
+    double rotation = -stick.getRawAxis(5) / 3;
 
     double leftSpeed = forward + rotation;
     double rightSpeed = forward - rotation;
@@ -117,30 +117,30 @@ public class Robot extends TimedRobot {
         if (result.hasTargets()) {
             PhotonTrackedTarget target = result.getBestTarget();
 
-            double yaw = target.getYaw();  // angle left/right to tag
+            // LEFT/RIGHT angle to tag
+            double yaw = target.getYaw();
 
-            // Distance from camera to tag (meters)
+            // FORWARD distance (positive Z direction)
             Transform3d camToTarget = target.getBestCameraToTarget();
-            double distance = camToTarget.getTranslation().getX();
+            double distance = camToTarget.getTranslation().getZ();  // meters
 
-            // Turning control
+            // TURN PID
             double turnSpeed = yaw * kP_turn;
-
-            // Forward control
-            double forwardSpeed = distance * kP_forward;
-
-            // Clamp speeds so robot doesn’t go crazy (Crazy like LE SRFM Crazy?)
             turnSpeed = Math.max(-0.4, Math.min(0.4, turnSpeed));
+
+            // FORWARD PID
+            double forwardError = distance - 0.5;     // target distance = 0.5 m
+            double forwardSpeed = forwardError * 0.25;
             forwardSpeed = Math.max(-0.5, Math.min(0.5, forwardSpeed));
 
-            // Stop when within 0.5 meters
+            // Stop when close enough
             if (distance < 0.5) {
                 forwardSpeed = 0;
                 turnSpeed = 0;
-                System.out.println("Reached Tag!");
+                System.out.println("Reached AprilTag!");
             }
 
-            // Tank drive output
+            // TANK DRIVE MIXING
             double leftSpeed = forwardSpeed + turnSpeed;
             double rightSpeed = forwardSpeed - turnSpeed;
 
@@ -153,12 +153,13 @@ public class Robot extends TimedRobot {
             System.out.println("AUTO: yaw=" + yaw + " dist=" + distance);
 
         } else {
+            // No tag → stop robot
             motorL1.set(ControlMode.PercentOutput, 0);
             motorL2.set(ControlMode.PercentOutput, 0);
             motorR1.set(ControlMode.PercentOutput, 0);
             motorR2.set(ControlMode.PercentOutput, 0);
 
-            System.out.println("AUTO: No tag!");
+            System.out.println("AUTO: No tag detected.");
         }
     }
 }
