@@ -27,7 +27,7 @@ public class Robot extends TimedRobot {
 
     // PID (ish) constants
     private final double kP_turn = 0.02;     // how hard to turn toward yaw correction
-    //private final double kP_forward = 0.2;   // how hard to drive toward target
+    private final double kP_forward = 0.01;   // how hard to drive toward target
 
     private boolean autoEnabled = false;
 
@@ -48,50 +48,51 @@ public class Robot extends TimedRobot {
 
     @Override
     public void robotPeriodic() {
-        // Get the latest result from the PhotonCamera
-        PhotonPipelineResult result = camera.getLatestResult();
-        // Check if the camera has detected any targets
-        if (result.hasTargets()) {
-            // Get the best target
-            PhotonTrackedTarget target = result.getBestTarget();
+        
+//         // Get the latest result from the PhotonCamera
+//         PhotonPipelineResult result = camera.getLatestResult();
+//         // Check if the camera has detected any targets
+//         if (result.hasTargets()) {
+//             // Get the best target
+//             PhotonTrackedTarget target = result.getBestTarget();
 
-            // Retrieve target information
-            double yaw = target.getYaw(); // Horizontal angle to target
-            //double pitch = target.getPitch(); // Vertical angle to target
+//             // Retrieve target information
+//             double yaw = target.getYaw(); // Horizontal angle to target
+//             //double pitch = target.getPitch(); // Vertical angle to target
 
-            // Get the transform from the camera to the target (if available)
-            Transform3d camToTarget = target.getBestCameraToTarget();
+//             // Get the transform from the camera to the target (if available)
+//             Transform3d camToTarget = target.getBestCameraToTarget();
 
-            if (camToTarget != null) {
-                System.out.println("Camera to Target Transform: " + camToTarget);
-//67
-                // Calculate the 3D distance from the camera to the target
-                double distance = Math.sqrt(
-                    camToTarget.getTranslation().getX() * camToTarget.getTranslation().getX() +
-                    camToTarget.getTranslation().getY() * camToTarget.getTranslation().getY() +
-                    camToTarget.getTranslation().getZ() * camToTarget.getTranslation().getZ()
-                );
+//             if (camToTarget != null) {
+//                 System.out.println("Camera to Target Transform: " + camToTarget);
+// //67
+//                 // Calculate the 3D distance from the camera to the target
+//                 double distance = Math.sqrt(
+//                     camToTarget.getTranslation().getX() * camToTarget.getTranslation().getX() +
+//                     camToTarget.getTranslation().getY() * camToTarget.getTranslation().getY() +
+//                     camToTarget.getTranslation().getZ() * camToTarget.getTranslation().getZ()
+//                 );
 
-                // Print the distance to the console
-                System.out.println("Distance to Target: " + distance);
-                // Get the id of the apriltag
-                int AprilId = target.getFiducialId();
-                // Print apriltag id
-                System.out.println("Detected ID: " + AprilId);
-                // Debug output for yaw and pitch
-                System.out.println("Yaw: " + yaw);
-                //System.out.println( "Pitch: " + pitch);
-            }
-        } else {
-            // No targets detected
-            System.out.println("No targets detected.");
-        }
+//                 // Print the distance to the console
+//                 System.out.println("Distance to Target: " + distance);
+//                 // Get the id of the apriltag
+//                 int AprilId = target.getFiducialId();
+//                 // Print apriltag id
+//                 System.out.println("Detected ID: " + AprilId);
+//                 // Debug output for yaw and pitch
+//                 System.out.println("Yaw: " + yaw);
+//                 //System.out.println( "Pitch: " + pitch);
+//             }
+//         } else {
+//             // No targets detected
+//             System.out.println("No targets detected.");
+//         }
     }
 
     @Override
     public void teleopPeriodic() {
-    double forward = stick.getRawAxis(0) / 3;
-    double rotation = -stick.getRawAxis(5) / 3;
+    double forward = -stick.getRawAxis(0) / 3;
+    double rotation = stick.getRawAxis(5) / 3;
 
     double leftSpeed = forward + rotation;
     double rightSpeed = forward - rotation;
@@ -117,30 +118,39 @@ public class Robot extends TimedRobot {
         if (result.hasTargets()) {
             PhotonTrackedTarget target = result.getBestTarget();
 
-            // LEFT/RIGHT angle to tag
-            double yaw = target.getYaw();
+            double yaw = target.getYaw();  // angle left/right to tag
 
-            // FORWARD distance (positive Z direction)
+            // Distance from camera to tag (meters)
             Transform3d camToTarget = target.getBestCameraToTarget();
-            double distance = camToTarget.getTranslation().getZ();  // meters
 
-            // TURN PID
+            double distance = Math.sqrt(
+                Math.pow(camToTarget.getTranslation().getX(), 2)
+                + 
+                Math.pow(camToTarget.getTranslation().getZ(), 2)
+            );
+
+            System.out.println(distance);
+            
+            //double distance = camToTarget.getTranslation().getZ();
+
+            // Turning control
             double turnSpeed = yaw * kP_turn;
-            turnSpeed = Math.max(-0.4, Math.min(0.4, turnSpeed));
 
-            // FORWARD PID
-            double forwardError = distance - 0.5;     // target distance = 0.5 m
-            double forwardSpeed = forwardError * 0.25;
+            // Forward control
+            double forwardSpeed = distance * kP_forward;
+
+            // Clamp speeds so robot doesn’t go crazy (Crazy like LE SRFM Crazy?)
+            turnSpeed = Math.max(-0.4, Math.min(0.4, turnSpeed));
             forwardSpeed = Math.max(-0.5, Math.min(0.5, forwardSpeed));
 
-            // Stop when close enough
-            if (distance < 0.5) {
+            // Stop when within
+            if (distance <= 1.6) {
                 forwardSpeed = 0;
                 turnSpeed = 0;
-                System.out.println("Reached AprilTag!");
+                System.out.println("Reached Tag!");
             }
 
-            // TANK DRIVE MIXING
+            // Tank drive output
             double leftSpeed = forwardSpeed + turnSpeed;
             double rightSpeed = forwardSpeed - turnSpeed;
 
@@ -153,13 +163,12 @@ public class Robot extends TimedRobot {
             System.out.println("AUTO: yaw=" + yaw + " dist=" + distance);
 
         } else {
-            // No tag → stop robot
             motorL1.set(ControlMode.PercentOutput, 0);
             motorL2.set(ControlMode.PercentOutput, 0);
             motorR1.set(ControlMode.PercentOutput, 0);
             motorR2.set(ControlMode.PercentOutput, 0);
 
-            System.out.println("AUTO: No tag detected.");
+            System.out.println("AUTO: No tag!");
         }
     }
 }
