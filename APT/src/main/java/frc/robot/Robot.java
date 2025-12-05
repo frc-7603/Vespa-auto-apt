@@ -13,6 +13,9 @@ import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.cscore.UsbCamera;
 import edu.wpi.first.math.geometry.Transform3d;
 
+// moves too slowly
+// not consistent enough
+
 public class Robot extends TimedRobot {
 
     private PhotonCamera camera; // Declare the camera instance
@@ -26,8 +29,12 @@ public class Robot extends TimedRobot {
     private final GenericHID stick = new GenericHID(0);
 
     // PID (ish) constants
+    
     private final double kP_turn = 0.02;     // how hard to turn toward yaw correction
     //private final double kP_forward = 0.2;   // how hard to drive toward target
+
+    private double maxTurnSpeed = .5;
+    private double maxForwardSpeed = .4;
 
     private boolean autoEnabled = false;
 
@@ -126,12 +133,12 @@ public class Robot extends TimedRobot {
 
             // TURN PID
             double turnSpeed = yaw * kP_turn;
-            turnSpeed = Math.max(-0.4, Math.min(0.4, turnSpeed));
+            turnSpeed = Math.max(-maxTurnSpeed, Math.min(maxTurnSpeed, turnSpeed));
 
             // FORWARD PID
             double forwardError = distance - 0.5;     // target distance = 0.5 m
             double forwardSpeed = forwardError * 0.25;
-            forwardSpeed = Math.max(-0.5, Math.min(0.5, forwardSpeed));
+            forwardSpeed = Math.max(-maxForwardSpeed, Math.min(maxForwardSpeed, forwardSpeed));
 
             // Stop when close enough
             if (distance < 0.5) {
