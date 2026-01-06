@@ -96,6 +96,11 @@ public class Robot extends TimedRobot {
     double leftSpeed = forward + rotation;
     double rightSpeed = forward - rotation;
 
+    motorR1.setInverted(false);
+    motorL2.setInverted(false);
+    motorR2.setInverted(false);
+    motorL1.setInverted(false);
+
     motorL1.set(ControlMode.PercentOutput, leftSpeed);
     motorL2.set(ControlMode.PercentOutput, leftSpeed);
 
@@ -122,7 +127,7 @@ public class Robot extends TimedRobot {
 
             // FORWARD distance (positive Z direction)
             Transform3d camToTarget = target.getBestCameraToTarget();
-            double distance = camToTarget.getTranslation().getZ();  // meters
+            double distance = camToTarget.getTranslation().getX();  // meters
 
             // TURN PID
             double turnSpeed = yaw * kP_turn;
