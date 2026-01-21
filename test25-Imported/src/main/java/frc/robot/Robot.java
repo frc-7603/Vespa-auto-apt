@@ -14,7 +14,7 @@ import com.revrobotics.spark.SparkMax;
 public class Robot extends TimedRobot {
 
   
-  RevMotor fuelMotor;
+  RevMotor fuelMotor = null;
 
 
 
@@ -25,42 +25,25 @@ public class Robot extends TimedRobot {
 
   // Shooter button mappings
   private final int intakeButton = 5;
-  private final int shootButton  = 6;
-  private final int revButton    = 7;
 
-  // Shooter speeds
-  private final double intakespeed = 0.67;   // adjust as needed
-  private final double firingspeed = -1;  // negative if needed for outtake
+  @Override
+  public void teleopInit() {}
+
 
   @Override
   public void teleopPeriodic() {
 
+    if (fuelMotor == null) fuelMotor = new RevMotor(2, MotorType.kBrushed);
+
     double fuelInSpeed = 0.4;
-    double fuelOutSpeed =-0.4;
-
-
-    // Drivetrain Control 
-    double forward = stick.getRawAxis(0) / 3;   // left stick X
-    double rotation = -stick.getRawAxis(5) / 3;   // right stick Y
 
     // Shooter Control 
     if (stick.getRawButton(intakeButton)) {
-      fuelMotor = new RevMotor(4, MotorType.kBrushed);
+      
+      fuelMotor.Motor.set(fuelInSpeed);
 
     } 
-    else if (stick.getRawButton(shootButton)) {
-
-    } 
-  else if (stick.getRawButton(revButton)) {
-      // Rev BOTH shooters
-
-    } 
-  else {
-    // Stop shooters
-
-  }
 }
-
   @Override
   public void autonomousInit() {}
 
